@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delhi PIN Code Directory</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f5f7fa; color: #333; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2c3e50, #3498db); color: white; padding: 40px 0; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 40px; }
+    header h1 { font-size: 2.2rem; margin-bottom: 8px; }
+    .content { background: white; padding: 32px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
+    .districts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 20px; }
+    .district-card { background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #3498db; }
+    .district-card h3 { margin-bottom: 8px; }
+    .district-card a { color: #2c3e50; text-decoration: none; font-weight: 700; }
+    .district-card a:hover { color: #3498db; }
+    .pincode-range { background: #3498db; color: white; padding: 5px 10px; border-radius: 5px; display: inline-block; font-size: .9rem; margin-top: 8px; }
+    .status { margin-top: 8px; color: #555; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Delhi PIN Code Directory</h1>
+      <p>District links and PIN ranges loaded from the official CSV data source.</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="content">
+      <h2>Select District in Delhi</h2>
+      <p class="status" id="status">Loading districts from CSV…</p>
+      <div class="districts-grid" id="districtGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    const CSV_URL = 'https://allpincodes.com/wp-content/uploads/2026/02/all_pincodes.india_.csv';
+    const DISTRICT_SLUG_MAP = {
+      'CENTRAL': 'central',
+      'EAST': 'east',
+      'NEW DELHI': 'new-delhi',
+      'NORTH': 'north',
+      'NORTH EAST': 'north-east',
+      'NORTH WEST': 'north-west',
+      'SHAHDARA': 'shahdara',
+      'SOUTH': 'south',
+      'SOUTH EAST': 'south-east',
+      'SOUTH WEST': 'south-west',
+      'WEST': 'west',
+    };
+
+    function parseCSV(text) {
+      const rows = [];
+      let cur = '';
+      let row = [];
+      let quoted = false;
+      for (const ch of text) {
+        if (ch === '"') {
+          quoted = !quoted;
+        } else if (ch === ',' && !quoted) {
+          row.push(cur); cur = '';
+        } else if ((ch === '\n' || ch === '\r') && !quoted) {
+          if (cur.length || row.length) { row.push(cur); rows.push(row); }
+          row = []; cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      if (cur.length || row.length) { row.push(cur); rows.push(row); }
+      return rows;
+    }
+
+    function minMax(values) {
+      const nums = values.map(v => Number(v)).filter(Number.isFinite);
+      if (!nums.length) return 'N/A';
+      return `${Math.min(...nums)} - ${Math.max(...nums)}`;
+    }
+
+    async function renderDistricts() {
+      const statusEl = document.getElementById('status');
+      const grid = document.getElementById('districtGrid');
+      try {
+        const response = await fetch(CSV_URL);
+        if (!response.ok) throw new Error(`Failed to fetch CSV (${response.status})`);
+        const text = await response.text();
+        const [header, ...dataRows] = parseCSV(text);
+        const stateIdx = header.findIndex(h => h.trim().toLowerCase() === 'state');
+        const districtIdx = header.findIndex(h => h.trim().toLowerCase() === 'district');
+        const pincodeIdx = header.findIndex(h => h.trim().toLowerCase().includes('pin'));
+        if ([stateIdx, districtIdx, pincodeIdx].includes(-1)) throw new Error('CSV columns state/district/pincode not found');
+
+        const byDistrict = {};
+        for (const row of dataRows) {
+          const state = (row[stateIdx] || '').trim().toUpperCase();
+          if (state !== 'DELHI') continue;
+          const district = (row[districtIdx] || '').trim().toUpperCase();
+          const pincode = (row[pincodeIdx] || '').trim();
+          if (!district || !pincode) continue;
+          byDistrict[district] = byDistrict[district] || [];
+          byDistrict[district].push(pincode);
+        }
+
+        const districts = Object.keys(byDistrict).sort((a, b) => a.localeCompare(b));
+        for (const district of districts) {
+          const slug = DISTRICT_SLUG_MAP[district] || district.toLowerCase().replace(/\s+/g, '-');
+          const href = `/pincodeof/india/delhi/${slug}/`;
+          const range = minMax(byDistrict[district]);
+          const card = document.createElement('div');
+          card.className = 'district-card';
+          card.innerHTML = `<h3><a href="${href}">${district} district</a></h3><div class="pincode-range">${range}</div>`;
+          grid.appendChild(card);
+        }
+
+        statusEl.textContent = `Loaded ${districts.length} Delhi districts from CSV.`;
+      } catch (error) {
+        statusEl.className = 'status error';
+        statusEl.textContent = `Unable to load district data: ${error.message}`;
+      }
+    }
+
+    renderDistricts();
+  </script>
+</body>
+</html>
