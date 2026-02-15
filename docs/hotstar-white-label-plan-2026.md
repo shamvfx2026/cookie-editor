@@ -1,326 +1,332 @@
 # White-Label Hotstar-Style OTT Launch Blueprint (India, 2026)
 
-## Who this is for
-A non-technical founder in India using a **white-label OTT vendor** (no internal engineering team), targeting launch in **4–6 months** with a **₹25L–₹50L Year-1 platform budget** (excluding content licensing).
+## Preview (What you will get if you execute this plan)
+- **Go-live window:** 4–6 months from vendor signing.
+- **Budget fit (platform only):** ₹25L–₹50L in Year 1 (excluding content rights).
+- **Business model:** Hybrid AVOD + SVOD + PPV.
+- **Core content engine:** Live Sports + Regional Movies (Tamil/Telugu/Hindi) + Originals (phase 2).
+- **Founder outcome:** A practical procurement checklist, launch roadmap, risk controls, and a 30-day pre-launch operating plan.
 
 ---
 
-## SECTION 1: Vendor Selection Criteria (Use this as your RFP + Contract Checklist)
+## Founder Context
+This blueprint is designed for a **non-technical founder** with no in-house development team, launching in India first and NRI markets second, using a **white-label OTT vendor**.
+
+---
+
+## SECTION 1: Vendor Selection Criteria (RFP + Contract Checklist)
 
 ## A) Non-Negotiables (must be in signed contract)
 
-| Requirement | Why it matters for your business | How to verify before signing | Contract clause to insist on |
+| Requirement | Why it matters | How to verify before signing | Contract language to demand |
 |---|---|---|---|
-| **LL-HLS (Low-Latency HLS)** | Live sports stickiness dies if stream is far behind real time | Ask for live demo with stopwatch (ground feed vs app feed) | Max live latency SLA (e.g., <=8 sec under normal load) |
-| **Multi-DRM (Widevine, PlayReady, FairPlay)** | Premium movie/sports rights require anti-piracy controls | Cross-device test matrix: Android, iOS Safari, Web, TV | DRM availability across all launch platforms |
-| **Concurrent stream monitoring** | Reduces account sharing and revenue leakage | Simulate over-limit logins and confirm auto-block/step-up auth | Device + stream limit policy by plan |
-| **1M+ spike readiness path** | IPL-style events create burst traffic and churn risk if app fails | Ask for load-test report + prior event case study | Capacity commitment + event war-room support |
-| **24/7 incident support** | Live outages are revenue-critical | Demand escalation tree with named contacts | P1 response SLA (e.g., 5–15 min) + service credits |
-| **India payment stack** (Razorpay/Cashfree/PhonePe + recurring) | Subscription conversion depends on familiar payment methods | End-to-end UAT: UPI intent, cards, autopay, retries | Multi-gateway failover, webhook reconciliation |
-| **Data ownership** | Your subscriber base must remain your asset | Verify data export APIs + report access | Full ownership of users, analytics, content metadata |
+| **LL-HLS support** | Live sports retention depends on low delay | Stopwatch demo: source feed vs app feed | Live latency SLA (target <=8 sec normal conditions) |
+| **Multi-DRM (Widevine/PlayReady/FairPlay)** | Rights protection for premium movies/sports | Device matrix test on Android/iOS/Web/TV | DRM must cover all launch platforms |
+| **Concurrent stream monitoring** | Prevents account sharing leakage | Simulate over-limit streams and auto-enforcement | Per-plan stream/device cap policy |
+| **1M+ spike-readiness pathway** | IPL-like traffic bursts can crash weak stacks | Ask for load-test evidence + event case study | Capacity commitment + match-day war-room |
+| **24/7 live incident support** | Outages during matches cause revenue damage | Verify named escalation contacts | P1 response SLA + service credits |
+| **India payments** (Razorpay/Cashfree/PhonePe + recurring) | Checkout convenience drives conversion | UAT for UPI, cards, mandates, retries | Multi-gateway failover + reconciled webhooks |
+| **Data ownership/exportability** | Subscriber data is your long-term asset | Request data export/API demonstration | Founder owns user/content/analytics data |
 
-### Event-readiness gate (mandatory before launch)
-- Vendor must run at least **one full dress rehearsal** for live sports:
-  - simulated traffic spike,
-  - chat moderation load,
-  - payment surge,
-  - failover drill.
+### Mandatory Event Readiness Gate
+Before launch, vendor must run one end-to-end simulation covering:
+- Live traffic spike
+- Chat moderation load
+- Payment surge
+- CDN failover
+- Incident escalation drill
 
-## B) Nice-to-Haves (prioritized if budget allows)
-- Built-in **Tournament Bracket UI** and fixture pages.
-- Multi-language audio tracks and subtitle packs.
-- Real-time score overlays and “key moments” markers.
-- In-app fan polls / emoji reactions.
-- AI-driven recommendations by language and genre.
+## B) Nice-to-Haves
+- Tournament bracket and fixture journey UI.
+- Multi-audio + subtitle language packs.
+- Real-time score overlays and key moments.
+- Emoji reactions and fan polls.
+- Language-personalized recommendation rails.
 
-## C) Red Flags (renegotiate or walk away)
-- No real Indian OTT customer references.
-- Revenue share on your subscription revenue >10%.
-- No 24/7 support for P1 incidents.
-- No transparent overage pricing (bandwidth/CDN/storage).
-- Vendor controls core app store accounts or content rights metadata.
+## C) Red Flags
+- No provable Indian OTT references.
+- Vendor revenue share on your subscription revenue >10%.
+- No 24/7 P1 support model.
+- Hidden overage fees (CDN/storage/bandwidth).
+- Vendor control over your app store ownership or customer data.
 
-## D) Vendor scorecard (weighted)
-Use this simple weighted model when comparing vendors:
-- **Reliability + live scale:** 35%
-- **Monetization fit (AVOD/SVOD/PPV):** 25%
-- **Time-to-launch:** 20%
-- **Total cost of ownership (12 months):** 20%
+## D) Vendor Score Model (weighted)
+- Reliability + scale = **35%**
+- Monetization fit = **25%**
+- Time-to-launch = **20%**
+- 12-month TCO = **20%**
 
 ---
 
-## SECTION 2: Feature Specification (What to ask vendor to deliver)
+## SECTION 2: Feature Specification
 
 ## A) User App Features (Android, iOS, Web, TV)
 
 ### 1) Login & Registration
-- **Primary:** Mobile OTP login.
-- **Secondary:** Email/password.
-- Optional: Google sign-in.
-- Device management page: “Logged in devices” + remote logout.
+- Primary: Mobile OTP.
+- Secondary: Email/password.
+- Optional: Google login.
+- Device screen for “active sessions” + remote logout.
 
-### 2) Home Screen & Discovery
-- Dynamic rails/carousels:
-  - **Live Now**
-  - **Trending in Your Language**
-  - **Continue Watching**
-  - **Exclusive Originals**
-- Language onboarding (Tamil, Telugu, Hindi, English).
-- Personalization based on watch history.
+### 2) Home & Discovery
+- Dynamic rails:
+  - Live Now
+  - Trending in Your Language
+  - Continue Watching
+  - Exclusive Originals
+- Language onboarding (Tamil/Telugu/Hindi/English).
+- Personalized recommendations.
 
-### 3) Video Player (core UX)
-- Gesture controls: double-tap seek, vertical brightness/volume swipe.
-- Auto-quality (ABR) with manual quality override.
-- Multi-audio + subtitles.
-- **Chromecast/AirPlay** support.
-- Resume playback across devices.
+### 3) Video Player
+- Double-tap seek and vertical swipe brightness/volume.
+- Adaptive bitrate auto-switching + manual override.
+- Multi-audio and subtitles.
+- Chromecast + AirPlay support.
+- Cross-device resume.
 
-### 4) Offline Downloads (premium only)
-- Available only for paying tiers.
-- Download expiry + DRM-protected offline playback.
-- Quality selector (Data Saver / Balanced / High).
+### 4) Offline Downloads (Premium only)
+- DRM-protected offline playback.
+- Download expiry policy.
+- Data Saver / Balanced / High quality modes.
 
 ### 5) Multi-Profile
-- Up to **5 profiles per account**.
-- Kids profile with PIN + age rating filter.
-- Profile avatar and language preferences per profile.
+- Up to 5 profiles per account.
+- Kids profile with PIN and age filters.
+- Profile-specific language and watch preference.
 
-### 6) Live Sports Experience
-- Live chat side panel with moderation controls.
+### 6) Live Sports UX
+- Side-panel live chat with moderation controls.
 - Emoji reactions.
-- Match score ticker + mini-stat cards.
-- Stream health fallback (quality downgrade prompt if bandwidth drops).
+- Score ticker and key stats cards.
+- Graceful fallback prompts on poor network.
 
 ## B) Admin Panel Features (Founder backend)
 
 ### 1) CMS
-- Drag-and-drop content rails.
-- Episode and movie scheduling (“Go live Friday 8 PM”).
-- Geo-rights windows + publish/unpublish automation.
+- Drag-and-drop rail management.
+- Time-based scheduling (e.g., Friday 8 PM release).
+- Geo-rights windows and publish automation.
 
 ### 2) User Management
-- Active users and active devices dashboard.
-- Force logout specific devices.
-- Ban / mute chat spammers.
+- Active user/device visibility.
+- Force logout by device.
+- Chat moderation and spam controls.
 
 ### 3) Analytics Dashboard
-- Real-time concurrent viewers.
-- Startup time, buffering ratio, playback failures.
-- Drop-off points (minute-wise churn in videos).
-- Revenue split by plans, city, language.
+- Real-time concurrency.
+- Startup delay, buffering ratio, fatal errors.
+- Drop-off curves (where users leave).
+- Revenue split by plan/language/city.
 
-### 4) Payment Integration
-- Razorpay, Cashfree, PhonePe.
-- Monthly/yearly recurring billing + retry logic.
-- GST-ready invoices and reconciliation reports.
+### 4) Payment Stack
+- Razorpay + Cashfree + PhonePe.
+- Monthly/yearly recurring billing with retries.
+- GST invoicing and reconciliation reports.
 
-### 5) Ad Management (AVOD)
-- Pre-roll + mid-roll ad slot configuration.
-- Frequency capping and ad pod limits.
-- Google Ad Manager (or vendor ad server) support.
+### 5) AVOD Ad Controls
+- Pre-roll and mid-roll placement.
+- Frequency caps and ad pod limits.
+- Google Ad Manager (or native vendor ad tool).
 
 ---
 
-## SECTION 3: Monetization Strategy (Hybrid AVOD + SVOD + PPV)
+## SECTION 3: Monetization Logic (AVOD + SVOD + PPV)
 
-## 1) Tiered Subscription Plans
+## 1) Subscription Tiers
 
-| Plan | Price | Quality | Devices | Offline | Ideal user profile |
+| Plan | Price | Quality | Devices | Offline | Best for |
 |---|---:|---|---:|---|---|
-| **Mobile** | ₹399/year | SD | 1 | No | Price-sensitive single-device users |
-| **Super** | ₹899/year | HD | 2 | Yes | Family and regular regional-content users |
-| **Premium** | ₹1499/year | 4K | 4 | Yes | Multi-device power users + English library seekers |
+| Mobile | ₹399/year | SD | 1 | No | Entry-level, mobile-only users |
+| Super | ₹899/year | HD | 2 | Yes | Family and regional movie users |
+| Premium | ₹1499/year | 4K | 4 | Yes | Power users and English library seekers |
 
-### Pricing logic to implement
-- Annual plans as default anchor.
-- Limited-time monthly plans for acquisition campaigns.
-- Smart upsell prompts:
-  - At device-limit hit -> suggest higher plan.
-  - After repeated downloads -> suggest Super/Premium.
+### Upsell Logic
+- Hit stream/device limit -> suggest next tier.
+- Repeat download behavior -> prompt upgrade.
+- PPV repeat buyers -> annual Super/Premium offer.
 
-## 2) AVOD (Free Tier)
-- Free catalog access with ads.
-- Ad placements:
-  - Pre-roll before content starts.
-  - Mid-roll in long-form content.
-- Free tier quality cap (e.g., SD/HD depending on ad yield).
-- Integrate with Google Ad Manager or native ad engine.
+## 2) AVOD Free Tier
+- Free catalog with ad-supported playback.
+- Ads: pre-roll + mid-roll.
+- Optional quality cap for free users (SD/HD).
+- Inventory via Google Ad Manager or vendor ad server.
 
-## 3) Live Sports PPV
-- Non-subscribers can buy **single match passes** (e.g., ₹25/match).
-- “Weekend pass” and “Tournament mini-pack” bundles.
-- Upgrade nudge: after 2–3 PPV purchases, offer Super annual at discount.
+## 3) PPV for Live Sports
+- Single match pass (example: ₹25).
+- Weekend packs and mini-tournament packs.
+- Conversion funnel from PPV to annual plan.
 
-## 4) Minimum KPI Targets for Year 1
-- Free-to-paid conversion: **2–5%**.
-- Payment success rate: **>=92%** at launch, improve to >=95%.
-- Monthly subscriber churn: **<6%** by month 9.
-- Ad fill rate (free inventory): **>70%**.
+## 4) Year-1 KPI Targets
+- Free-to-paid conversion: 2–5%.
+- Payment success: >=92% at launch, target >=95% after optimization.
+- Monthly paid churn: <6% by month 9.
+- Ad fill rate on free inventory: >70%.
 
 ---
 
-## SECTION 4: Technical Architecture & Scalability (Vendor responsibilities)
+## SECTION 4: Technical Architecture & Scalability
 
-## A) Required architecture blocks
-1. **Live ingest + transcoding**: redundant encoders, ABR ladder.
-2. **Packaging + protection**: LL-HLS + Multi-DRM.
-3. **Origin + Multi-CDN**: Akamai/CloudFront + India-strong CDN route.
-4. **Microservices autoscaling**: auth, catalog, billing, chat.
-5. **Observability layer**: QoE dashboards, alerting, log correlation.
-6. **Engagement integrations**: CleverTap/MoEngage for push + journeys.
+## A) Required Architecture Blocks
+1. Redundant live ingest + transcoding with ABR ladders.
+2. LL-HLS packaging + Multi-DRM enforcement.
+3. Multi-CDN strategy (Akamai/CloudFront + India-optimized route).
+4. Autoscaled services: auth/catalog/billing/chat.
+5. Observability: QoE metrics, logs, incident alerts.
+6. Engagement pipeline: CleverTap/MoEngage integration.
 
-## B) Scalability guardrails for contract
-- Auto-scaling policy documented and tested.
-- Multi-region failover with runbook.
-- RTO <=15 minutes, RPO <=5 minutes for business-critical services.
-- Pre-event capacity checks with 2x expected peak headroom.
-- Quarterly disaster simulation drills.
+## B) Contract Guardrails
+- Documented autoscaling policy and thresholds.
+- Multi-region failover runbook.
+- RTO <=15 min, RPO <=5 min for critical workloads.
+- 2x projected peak capacity before marquee events.
+- Quarterly disaster and failover rehearsals.
 
-## C) Day-1 no-crash checklist
+## C) Day-1 Stability Checklist
 - CDN failover tested in staging and production.
-- Playback tested across low-network (3G/weak 4G) conditions.
-- Peak chat moderation staffing assigned for live events.
-- Real-time NOC dashboard shared with founder team.
+- Playback tested on weak network profiles.
+- Match-day moderation staffing planned.
+- Live NOC dashboard access for founder team.
 
 ---
 
-## SECTION 5: 30-Day Pre-Launch Plan (Non-technical founder playbook)
+## SECTION 5: 30-Day Pre-Launch Plan
 
-## Week 1: Commercial + content onboarding
-- Finalize MSA/SOW/SLA with penalties and escalation matrix.
-- Freeze launch scope (platforms, languages, target cities).
-- Upload initial content library target: **500+ hours**.
-- Lock metadata standards and artwork templates.
+## Week 1: Contract + catalog foundation
+- Close MSA/SOW/SLA with penalties and escalation matrix.
+- Freeze launch scope (platforms, cities, languages).
+- Start catalog onboarding target: 500+ hours.
+- Lock metadata and artwork templates.
 
-## Week 2: App branding + functional setup
-- Apply brand kit (logo, color palette, app icon, splash).
-- Configure subscription plans + ad rules + payment gateways.
-- Enable chat moderation workflows and user policy.
-- Conduct internal UAT on top 20 user journeys.
+## Week 2: Product configuration
+- Apply brand elements (logo/color/splash/app icon).
+- Configure plans, gateways, ad rules, and taxes.
+- Enable moderation and policy controls.
+- Validate top 20 critical user journeys.
 
-## Week 3: Beta + growth setup
-- Closed beta with 100 users (friends/family/partners).
-- App Store/Play Store listing drafts:
-  - “Live Cricket Streaming”
-  - “Tamil Movies Online”
-  - “Telugu Movies & Web Series”
-- Setup CRM journeys (welcome, payment failed, match reminder).
+## Week 3: Beta + growth prep
+- Closed beta with 100 controlled users.
+- ASO copy for: “Live Cricket Streaming”, “Tamil Movies Online”, “Telugu Movies & Web Series”.
+- Set up CRM journeys: welcome, failed payment, match reminder.
 
 ## Week 4: Soft launch + optimization
-- City-wise paid tests (e.g., Chennai, Hyderabad, Bengaluru).
-- Track CAC, trial-to-paid, payment success, buffering, crashes.
-- Tune pricing copy, paywall flow, and ad load settings.
-- Prepare full launch report and go/no-go decision.
+- City-level campaigns (Chennai, Hyderabad, Bengaluru).
+- Monitor CAC, payment success, startup delay, buffering, crashes.
+- Iterate paywall messaging and ad frequency.
+- Run go/no-go review for wider launch.
 
 ---
 
 ## SECTION 6: Deliverables
 
-## 6.1 Comparison Matrix — 5 White-Label Vendors (Indicative 2026 view)
+## 6.1 Comparison Matrix (Indicative 2026 pricing)
 
-> Pricing below is indicative and can vary significantly by MAU, app count, DRM, support SLAs, and live-event volumes.
+> Note: pricing is indicative; final pricing depends on MAU, feature scope, DRM, app count, and live-event loads.
 
-| Vendor | Approx Year-1 Platform Cost (excluding content) | India-market readiness | Strengths | Watch-outs |
+| Vendor | Indicative Year-1 Platform Cost | India fit | Strength | Watch-out |
 |---|---:|---|---|---|
-| **Contus VPlay** | ₹20L–₹50L | High | Live-streaming modules, enterprise deployment options | Scope clarity needed (platform vs custom services) |
-| **VPlayed** | ₹18L–₹45L | High | Flexible customization, DRM-focused positioning | Costs can rise with add-ons and managed services |
-| **Muvi** | ₹12L–₹35L | Medium-High | Faster SaaS deployment, all-in-one operations | App customization depth may need higher tiers |
-| **Zype** | ₹15L–₹40L (FX dependent) | Medium | API-first architecture, integration flexibility | Local payments and India localization need verification |
-| **Uscreen** | ₹8L–₹25L | Medium | Quick setup, creator-friendly workflows | Live sports scale and India-specific requirements may need extra tooling |
+| Contus VPlay | ₹20L–₹50L | High | Live-event orientation | Scope/service split must be explicit |
+| VPlayed | ₹18L–₹45L | High | Customization + DRM positioning | Add-ons can inflate TCO |
+| Muvi | ₹12L–₹35L | Medium-High | Faster SaaS setup | Deeper customization may need higher tier |
+| Zype | ₹15L–₹40L (FX-based) | Medium | API-first flexibility | India-local payment/localization validation needed |
+| Uscreen | ₹8L–₹25L | Medium | Fast onboarding | Sports-scale requirements may need extra tooling |
 
-### Recommendation
-Shortlist top 3, then run a **2-week paid proof-of-concept**:
-- one high-concurrency live stream,
-- one AVOD funnel,
-- one subscription checkout flow.
+### Shortlist method
+Run a 2-week paid PoC for top 3 vendors:
+1. High-concurrency live stream simulation
+2. AVOD journey validation
+3. Subscription checkout and renewal flow
 
-## 6.2 Gantt Chart — 6-Month Roadmap (Signing to Launch)
+## 6.2 Gantt Chart (6-Month Signing-to-Launch Roadmap)
 
 ```mermaid
 gantt
-    title White-Label OTT 6-Month Rollout Plan
+    title White-Label OTT 6-Month Rollout
     dateFormat  YYYY-MM-DD
     axisFormat  %b %d
 
     section Contract & Planning
     Vendor finalization + legal closure         :a1, 2026-01-01, 21d
-    Discovery workshops + scope freeze          :a2, after a1, 14d
+    Discovery + scope freeze                    :a2, after a1, 14d
 
-    section Build Configuration
-    Branding, app config, workflows             :b1, after a2, 21d
-    Payment + plans + taxation setup            :b2, after a2, 21d
-    DRM/CDN/live architecture setup             :b3, after a2, 28d
+    section Platform Setup
+    Branding + app configuration                :b1, after a2, 21d
+    Payment/tax/plan configuration              :b2, after a2, 21d
+    DRM + CDN + live stack setup                :b3, after a2, 28d
 
-    section Content Operations
+    section Content Ops
     Content ingestion (500+ hrs)                :c1, after a2, 45d
-    Metadata, subtitles, artwork QA             :c2, after c1, 20d
+    Metadata/subtitles/creative QA              :c2, after c1, 20d
 
     section QA & Beta
     Device QA (Android/iOS/Web/TV)              :d1, after b1, 28d
     Closed beta (100 users)                     :d2, after d1, 14d
-    Load + failover + incident rehearsal        :d3, after b3, 14d
+    Load/failover/incident rehearsal            :d3, after b3, 14d
 
     section Go-to-Market
-    ASO/SEO + performance creatives + CRM       :e1, after d2, 21d
-    Soft launch in selected cities              :e2, after e1, 14d
-    National launch + marquee sports campaign   :e3, after e2, 14d
+    ASO/SEO/creatives/CRM setup                 :e1, after d2, 21d
+    Soft launch (select cities)                 :e2, after e1, 14d
+    Full launch + sports campaign               :e3, after e2, 14d
 ```
 
-## 6.3 Risk Assessment — Top 5 Risks + Fast Response Plan
+## 6.3 Risk Assessment (Top 5 + Fast Mitigation)
 
-| Risk | Signal to watch | Immediate fix (0–4 hrs) | Long-term prevention |
+| Risk | Early signal | 0–4 hr action | Prevention |
 |---|---|---|---|
-| CDN failure during live event | Sudden buffering spike by region | Shift to backup CDN route; reduce top bitrate rung | Multi-CDN policy + pre-event stress tests |
-| Payment gateway downtime | Payment success drop, timeout spikes | Auto-failover gateway priority chain | Multi-gateway orchestration + webhook reconciliation |
-| Account sharing/piracy | Unusual concurrent logins; leaked stream links | Enforce stream limits, rotate session tokens, watermarking | Device trust scoring + anti-piracy monitoring vendors |
-| Vendor support delay (P1 incident) | Slow response in first 10 min | Trigger escalation matrix; activate war-room bridge | Contracted SLA penalties + quarterly mock drills |
-| Poor free-to-paid conversion | High DAU, low checkout completion | Simplify paywall; run language-based offers | Continuous A/B testing + lifecycle messaging automation |
+| CDN outage during live match | Region-wise buffering surge | Switch to backup CDN, reduce top bitrate rung | Multi-CDN routing + pre-event stress test |
+| Payment gateway downtime | Checkout failures spike | Trigger gateway failover order | Multi-gateway orchestration + reconciliation |
+| Piracy/account sharing | Concurrency anomalies, leaked links | Enforce stream caps, rotate tokens, watermark streams | Anti-piracy monitoring + stricter device policy |
+| Slow vendor P1 response | No action in first 10–15 min | Trigger escalation and war-room bridge | SLA penalties + mock incident drills |
+| Weak free-to-paid conversion | High DAU, poor checkout completion | Simplify paywall, localized offers | Ongoing funnel A/B testing + CRM nudges |
 
-## 6.4 Content Acquisition Checklist (Execution-ready)
+## 6.4 Content Acquisition Checklist
 
-## A) Legal checklist
-- Signed rights agreements for territory, language, duration.
-- Explicit rights for VOD, live, clips, trailers, promos.
-- Takedown and indemnity clauses in place.
-- Compliance with Indian ratings/content advisories.
+## A) Legal
+- Signed rights by territory/language/window.
+- Explicit rights for VOD/live/clips/trailers/promos.
+- Takedown and indemnity clauses.
+- Indian ratings/compliance readiness.
 
-## B) Asset delivery checklist
-- Mezzanine masters (codec, bitrate as per ingest spec).
-- Posters (portrait + landscape), thumbnails, logo files.
-- Trailer package: 15s / 30s / 60s.
-- Subtitle/caption files and multi-audio tracks.
+## B) Assets
+- Mezzanine masters per ingest spec.
+- Poster packs (portrait/landscape), thumbnails, logos.
+- Trailer cuts (15s, 30s, 60s).
+- Subtitle/caption and audio language files.
 
-## C) Metadata checklist
-- Title (localized), synopsis short/long.
+## C) Metadata
+- Localized titles + short/long synopsis.
 - Cast/crew, genre, release year, language tags.
-- Maturity rating + advisories.
-- Sports metadata: league, teams, season, match ID, highlight markers.
+- Maturity labels and advisories.
+- Sports metadata (league/team/season/match IDs/highlights).
 
-## D) QA checklist
-- AV sync and subtitle sync verification.
-- DRM playback on all target devices.
-- Geo-rights and schedule validation.
-- Final legal + content ops sign-off before publish.
+## D) QA
+- AV and subtitle sync checks.
+- DRM playback verification across target devices.
+- Geo-rights and schedule window validation.
+- Final legal + content-ops sign-off.
 
 ---
 
-## Suggested Year-1 Budget Split (Platform only: ₹25L–₹50L)
+## Year-1 Budget Split (Platform only: ₹25L–₹50L)
 
-| Cost head | Lean (₹25L model) | Growth (₹50L model) |
+| Cost head | Lean | Growth |
 |---|---:|---:|
 | White-label license + app packaging | ₹9L | ₹18L |
 | CDN/DRM/streaming infra | ₹5L | ₹10L |
 | Managed support + NOC/event ops | ₹3L | ₹6L |
 | Analytics/CRM tools | ₹2L | ₹5L |
-| Launch marketing experiments | ₹6L | ₹11L |
+| Marketing experiments | ₹6L | ₹11L |
 | **Total** | **₹25L** | **₹50L** |
 
 ---
 
-## Founder Next-Step Action Plan (next 10 days)
-1. Send RFP to 5 shortlisted vendors using Section 1 checklist.
-2. Collect at least 2 India references per vendor and verify by call.
-3. Negotiate fixed-fee with capped overages; avoid high revenue share.
-4. Freeze MVP scope for 4-month go-live (avoid feature creep).
-5. Book one marquee live event for launch-month traction.
-6. Finalize content operations partner for metadata + QA throughput.
+## 10-Day Founder Action Sprint
+1. Send RFP to 5 vendors using Section 1 requirements.
+2. Verify at least 2 Indian customer references per vendor.
+3. Negotiate fixed-fee with overage caps and SLA penalties.
+4. Freeze MVP for 4-month launch and avoid feature creep.
+5. Lock launch content slate and one marquee live event.
+6. Appoint content-ops partner for metadata + QA throughput.
+7. Pre-book launch creatives and city-level media plan.
+8. Run UAT sign-off meeting with vendor and internal stakeholders.
+9. Validate dashboards for payments, QoE, and conversion.
+10. Confirm soft-launch date and incident war-room staffing.
