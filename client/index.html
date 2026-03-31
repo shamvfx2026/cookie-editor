@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulseBrief - SPA News</title>
+    <meta name="description" content="Production-ready single page news website with fast local caching and category filters." />
+    <meta property="og:title" content="PulseBrief - SPA News" />
+    <meta property="og:description" content="Read latest curated US headlines from a locally cached backend." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      tailwind = { config: { darkMode: 'class' } };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="h-full bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div class="min-h-full">
+      <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
+          <div>
+            <p class="text-xs uppercase tracking-[0.24em] text-sky-600 dark:text-sky-400">SPA News</p>
+            <h1 class="text-xl font-semibold">PulseBrief</h1>
+          </div>
+          <button id="themeToggle" class="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800">Toggle Theme</button>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <section class="mb-5 grid gap-3 md:grid-cols-[1fr_auto]">
+          <label class="relative block">
+            <span class="sr-only">Search news</span>
+            <input id="searchInput" type="text" placeholder="Search by title, source or description..." class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-sky-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800" />
+          </label>
+
+          <select id="categorySelect" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-sky-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800">
+            <option value="">All categories</option>
+            <option value="business">Business</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="general">General</option>
+            <option value="health">Health</option>
+            <option value="science">Science</option>
+            <option value="sports">Sports</option>
+            <option value="technology">Technology</option>
+          </select>
+        </section>
+
+        <section id="skeletonGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"></section>
+
+        <section id="newsGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"></section>
+
+        <div id="emptyState" class="hidden rounded-xl border border-dashed border-slate-400 p-8 text-center text-sm text-slate-500 dark:border-slate-700">
+          No news found for your filter.
+        </div>
+
+        <div class="mt-8 flex justify-center">
+          <button id="loadMoreBtn" class="hidden rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-sky-700">Load more</button>
+        </div>
+      </main>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -1,11 +1,29 @@
 {
   "name": "cookie-editor",
   "version": "1.13.0",
+  "description": "Production-ready single page news website with Node.js, Express, cron sync, and SQLite local cache",
+  "main": "server/server.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Moustachauve/cookie-editor.git"
   },
   "license": "GPL-3.0-only",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "lint": "eslint . --config eslint.config.mjs",
+    "lint:fix": "eslint . --fix --config eslint.config.mjs"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "compression": "^1.8.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0",
+    "node-cron": "^4.0.5",
+    "sqlite3": "^5.1.7"
+  },
   "devDependencies": {
     "eslint": "^8.47.0",
     "eslint-config-google": "^0.14.0",
@@ -23,9 +41,5 @@
     "prettier": "^3.5.3",
     "prettier-eslint": "^16.4.2",
     "prettier-plugin-organize-imports": "^4.1.0"
-  },
-  "scripts": {
-    "lint": "eslint . --config eslint.config.mjs",
-    "lint:fix": "eslint . --fix --config eslint.config.mjs"
   }
 }
