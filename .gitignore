@@ -30,3 +30,8 @@ xcuserdata/
 .history
 .ionide
 .DS_Store
+
+# News SPA local runtime files
+.env
+server/database/news.sqlite
+server/database/news.sqlite-*

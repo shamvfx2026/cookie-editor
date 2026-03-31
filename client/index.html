@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulseBrief - SPA News</title>
+    <meta
+      name="description"
+      content="Production-ready single page news website with fast local caching and category filters."
+    />
+    <meta property="og:title" content="PulseBrief - SPA News" />
+    <meta
+      property="og:description"
+      content="Read latest curated US headlines from a locally cached backend."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      tailwind = { config: { darkMode: 'class' } };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body
+    class="h-full bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-900 dark:text-slate-100"
+  >
+    <div class="min-h-full">
+      <header
+        class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90"
+      >
+        <div
+          class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8"
+        >
+          <div>
+            <p class="text-xs uppercase tracking-[0.24em] text-sky-600 dark:text-sky-400">SPA News</p>
+            <h1 class="text-xl font-semibold">PulseBrief</h1>
+          </div>
+          <button
+            id="themeToggle"
+            class="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+          >
+            Toggle Theme
+          </button>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <section id="headlineSection" class="mb-6 hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          <p class="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400">Headline</p>
+          <h2 id="headlineTitle" class="mb-2 text-2xl font-bold leading-tight"></h2>
+          <p id="headlineDescription" class="mb-3 text-sm text-slate-600 dark:text-slate-300"></p>
+          <a id="headlineLink" class="text-sm font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400" target="_blank" rel="noopener noreferrer">Read headline story →</a>
+        </section>
+
+        <section class="mb-5 grid gap-3 md:grid-cols-[1fr_auto]">
+          <label class="relative block">
+            <span class="sr-only">Search news</span>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search by title, source or description..."
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-sky-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+            />
+          </label>
+
+          <select
+            id="categorySelect"
+            class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-sky-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+          >
+            <option value="">All categories</option>
+            <option value="business">Business</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="general">General</option>
+            <option value="health">Health</option>
+            <option value="science">Science</option>
+            <option value="sports">Sports</option>
+            <option value="technology">Technology</option>
+          </select>
+        </section>
+
+        <section class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div>
+            <section
+              id="skeletonGrid"
+              class="grid grid-cols-1 gap-4 sm:grid-cols-2"
+            ></section>
+
+            <section
+              id="newsGrid"
+              class="grid grid-cols-1 gap-4 sm:grid-cols-2"
+            ></section>
+
+            <div
+              id="emptyState"
+              class="hidden rounded-xl border border-dashed border-slate-400 p-8 text-center text-sm text-slate-500 dark:border-slate-700"
+            >
+              No news found for your filter.
+            </div>
+
+            <div class="mt-8 flex justify-center">
+              <button
+                id="loadMoreBtn"
+                class="hidden rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-sky-700"
+              >
+                Load more
+              </button>
+            </div>
+          </div>
+
+          <aside class="space-y-4">
+            <section class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Latest News</h3>
+              <ul id="latestList" class="space-y-3 text-sm"></ul>
+            </section>
+            <section class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Older Articles</h3>
+              <ul id="olderList" class="space-y-3 text-sm"></ul>
+            </section>
+          </aside>
+        </section>
+      </main>
+
+      <footer class="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div class="mx-auto max-w-7xl px-4 py-6 text-xs text-slate-500 dark:text-slate-400 sm:px-6 lg:px-8">
+          <p class="mb-2 font-semibold text-slate-700 dark:text-slate-200">PulseBrief News</p>
+          <p class="mb-2">Privacy Policy: We do not require accounts and only store technical logs for operations.</p>
+          <p>Terms & Conditions: News content may include third-party materials from external publishers. Rights belong to original owners; links and summaries are provided for informational use.</p>
+        </div>
+      </footer>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
