@@ -47,6 +47,14 @@
       </header>
 
       <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <section class="mb-5 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+          <div class="flex items-center gap-2 border-b border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-rose-600 dark:border-slate-700 dark:text-rose-400">
+            Breaking
+            <span id="lastUpdated" class="normal-case tracking-normal text-slate-500 dark:text-slate-400"></span>
+          </div>
+          <div class="ticker-track px-4 py-2" id="tickerTrack"></div>
+        </section>
+
         <section id="headlineSection" class="mb-6 hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
           <p class="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-rose-600 dark:text-rose-400">Headline</p>
           <h2 id="headlineTitle" class="mb-2 text-2xl font-bold leading-tight"></h2>
@@ -54,7 +62,7 @@
           <a id="headlineLink" class="text-sm font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400" target="_blank" rel="noopener noreferrer">Read headline story →</a>
         </section>
 
-        <section class="mb-5 grid gap-3 md:grid-cols-[1fr_auto]">
+        <section class="mb-5 grid gap-3 md:grid-cols-[1fr_auto_auto]">
           <label class="relative block">
             <span class="sr-only">Search news</span>
             <input
@@ -77,6 +85,15 @@
             <option value="science">Science</option>
             <option value="sports">Sports</option>
             <option value="technology">Technology</option>
+          </select>
+
+          <select
+            id="sortSelect"
+            class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-sky-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+          >
+            <option value="newest">Sort: Newest</option>
+            <option value="oldest">Sort: Oldest</option>
+            <option value="source">Sort: Source A-Z</option>
           </select>
         </section>
 
@@ -117,6 +134,10 @@
             <section class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
               <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Older Articles</h3>
               <ul id="olderList" class="space-y-3 text-sm"></ul>
+            </section>
+            <section class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Saved Articles</h3>
+              <ul id="savedList" class="space-y-3 text-sm"></ul>
             </section>
           </aside>
         </section>

@@ -1,15 +1,20 @@
+const SAVED_ARTICLES_KEY = 'pulsebrief_saved_articles';
+
 const state = {
   page: 1,
   pageSize: 12,
   category: '',
   search: '',
+  sort: 'newest',
   loading: false,
   hasMore: true,
+  savedArticles: [],
 };
 
 const elements = {
   searchInput: document.getElementById('searchInput'),
   categorySelect: document.getElementById('categorySelect'),
+  sortSelect: document.getElementById('sortSelect'),
   newsGrid: document.getElementById('newsGrid'),
   skeletonGrid: document.getElementById('skeletonGrid'),
   loadMoreBtn: document.getElementById('loadMoreBtn'),
@@ -21,6 +26,9 @@ const elements = {
   headlineLink: document.getElementById('headlineLink'),
   latestList: document.getElementById('latestList'),
   olderList: document.getElementById('olderList'),
+  savedList: document.getElementById('savedList'),
+  tickerTrack: document.getElementById('tickerTrack'),
+  lastUpdated: document.getElementById('lastUpdated'),
 };
 
 function setTheme(mode) {
@@ -46,6 +54,20 @@ function escapeHtml(value = '') {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+}
+
+function sortArticles(articles) {
+  const list = [...articles];
+
+  if (state.sort === 'oldest') {
+    return list.sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt));
+  }
+
+  if (state.sort === 'source') {
+    return list.sort((a, b) => (a.source || '').localeCompare(b.source || ''));
+  }
+
+  return list.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 }
 
 function renderSkeletons(count = 6) {
@@ -109,22 +131,78 @@ function renderSidebarList(target, articles, emptyMessage) {
     .join('');
 }
 
+function renderTicker(articles) {
+  if (!articles.length) {
+    elements.tickerTrack.innerHTML = '<p class="text-sm text-slate-500 dark:text-slate-400">No breaking updates.</p>';
+    return;
+  }
+
+  const items = articles
+    .slice(0, 8)
+    .map((article) => `<span class="inline-block mr-8">• ${escapeHtml(article.title)}</span>`)
+    .join('');
+
+  elements.tickerTrack.innerHTML = `<div class="ticker-content">${items}${items}</div>`;
+}
+
+function readSavedArticles() {
+  try {
+    const raw = localStorage.getItem(SAVED_ARTICLES_KEY);
+    state.savedArticles = raw ? JSON.parse(raw) : [];
+  } catch {
+    state.savedArticles = [];
+  }
+}
+
+function persistSavedArticles() {
+  localStorage.setItem(SAVED_ARTICLES_KEY, JSON.stringify(state.savedArticles));
+}
+
+function isSaved(article) {
+  return state.savedArticles.some((saved) => saved.url && saved.url === article.url);
+}
+
+function toggleSaveArticle(article) {
+  if (!article.url) {
+    return;
+  }
+
+  if (isSaved(article)) {
+    state.savedArticles = state.savedArticles.filter((saved) => saved.url !== article.url);
+  } else {
+    state.savedArticles.unshift({
+      title: article.title,
+      source: article.source,
+      url: article.url,
+    });
+    state.savedArticles = state.savedArticles.slice(0, 20);
+  }
+
+  persistSavedArticles();
+  renderSidebarList(elements.savedList, state.savedArticles.slice(0, 6), 'No saved articles yet.');
+}
+
 function renderSidebars(articles) {
   const latest = articles.slice(0, 5);
   const older = articles.slice(5, 10);
   renderSidebarList(elements.latestList, latest, 'No latest items right now.');
   renderSidebarList(elements.olderList, older, 'No older items right now.');
+  renderSidebarList(elements.savedList, state.savedArticles.slice(0, 6), 'No saved articles yet.');
 }
 
 function renderNewsCard(article) {
   const imageUrl = article.image || 'https://placehold.co/600x400?text=No+Image';
   const publishedDate = new Date(article.publishedAt).toLocaleString();
+  const saved = isSaved(article);
 
   return `
     <article class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800">
       <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(article.title)}" class="h-44 w-full object-cover" loading="lazy" referrerpolicy="no-referrer" />
       <div class="space-y-3 p-4">
-        <p class="text-xs font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">${escapeHtml(article.category)}</p>
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs font-medium uppercase tracking-wide text-sky-600 dark:text-sky-400">${escapeHtml(article.category)}</p>
+          <button data-save-url="${escapeHtml(article.url || '')}" class="rounded-md border px-2 py-1 text-xs ${saved ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-300'}">${saved ? 'Saved' : 'Save'}</button>
+        </div>
         <h2 class="line-clamp-2 text-base font-semibold">${escapeHtml(article.title)}</h2>
         <p class="line-clamp-3 text-sm text-slate-600 dark:text-slate-300">${escapeHtml(article.description || '')}</p>
         <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
@@ -139,6 +217,22 @@ function renderNewsCard(article) {
       </div>
     </article>
   `;
+}
+
+function bindSaveButtons(articles) {
+  elements.newsGrid.querySelectorAll('[data-save-url]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const url = button.getAttribute('data-save-url');
+      const selectedArticle = articles.find((item) => item.url === url);
+      if (!selectedArticle) {
+        return;
+      }
+      toggleSaveArticle(selectedArticle);
+      const refreshed = sortArticles(articles);
+      elements.newsGrid.innerHTML = refreshed.map(renderNewsCard).join('');
+      bindSaveButtons(refreshed);
+    });
+  });
 }
 
 function updateLoadMore(hasMore) {
@@ -190,17 +284,22 @@ async function fetchNews({ append = false } = {}) {
     }
 
     const payload = await response.json();
-    const cards = payload.data.map(renderNewsCard).join('');
+    const sortedArticles = sortArticles(payload.data);
+    const cards = sortedArticles.map(renderNewsCard).join('');
 
     if (append) {
       elements.newsGrid.insertAdjacentHTML('beforeend', cards);
+      bindSaveButtons(sortedArticles);
     } else {
-      renderHeadline(payload.data[0]);
-      renderSidebars(payload.data);
+      renderHeadline(sortedArticles[0]);
+      renderSidebars(sortedArticles);
+      renderTicker(sortedArticles);
+      elements.lastUpdated.textContent = `• Updated ${new Date(payload.updatedAt).toLocaleString()}`;
       elements.newsGrid.innerHTML = cards;
+      bindSaveButtons(sortedArticles);
     }
 
-    if (!append && payload.data.length === 0) {
+    if (!append && sortedArticles.length === 0) {
       elements.emptyState.classList.remove('hidden');
     }
 
@@ -210,6 +309,8 @@ async function fetchNews({ append = false } = {}) {
     if (!append) {
       renderHeadline(null);
       renderSidebars([]);
+      renderTicker([]);
+      elements.lastUpdated.textContent = '';
       elements.newsGrid.innerHTML =
         '<p class="rounded-xl bg-rose-100 p-4 text-sm text-rose-700">Unable to load news right now. Try again later.</p>';
     }
@@ -245,6 +346,12 @@ function registerEvents() {
     fetchNews();
   });
 
+  elements.sortSelect.addEventListener('change', (event) => {
+    state.sort = event.target.value;
+    resetResults();
+    fetchNews();
+  });
+
   elements.loadMoreBtn.addEventListener('click', () => {
     if (!state.hasMore) {
       return;
@@ -260,5 +367,6 @@ function registerEvents() {
 }
 
 initializeTheme();
+readSavedArticles();
 registerEvents();
 fetchNews();
