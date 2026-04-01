@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India PIN Code Directory</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f5f7fa; color: #333; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2c3e50, #3498db); color: white; padding: 40px 0; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 40px; }
+    header h1 { font-size: 2.2rem; margin-bottom: 8px; }
+    .content { background: white; padding: 32px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card { background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #3498db; }
+    .card h3 { margin-bottom: 8px; }
+    .card a { color: #2c3e50; text-decoration: none; font-weight: 700; }
+    .card a:hover { color: #3498db; }
+    .badge { background: #3498db; color: white; padding: 5px 10px; border-radius: 5px; display: inline-block; font-size: .9rem; margin-top: 8px; }
+    .status { margin-top: 8px; color: #555; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1 id="title">India PIN Code Directory</h1>
+    <p id="subtitle">State and district links generated from the official CSV source.</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="content">
+    <h2 id="sectionTitle">Loading…</h2>
+    <p class="status" id="status">Loading data from CSV…</p>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<script>
+  const CSV_URL = 'https://allpincodes.com/wp-content/uploads/2026/02/all_pincodes.india_.csv';
+
+  function slugify(value) {
+    return value
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/[_\s]+/g, '-')
+      .replace(/-+/g, '-');
+  }
+
+  // Use one stable endpoint for all pages, prevents 404 when specific WP child pages are missing.
+  function buildLink(state, district) {
+    const url = new URL('/pincodeof/india/', window.location.origin);
+    url.searchParams.set('state', slugify(state));
+    if (district) url.searchParams.set('district', slugify(district));
+    return `${url.pathname}${url.search}`;
+  }
+
+  function parseCSV(text) {
+    const rows = [];
+    let cur = '';
+    let row = [];
+    let quoted = false;
+    for (let i = 0; i < text.length; i += 1) {
+      const ch = text[i];
+      if (ch === '"') {
+        if (quoted && text[i + 1] === '"') {
+          cur += '"';
+          i += 1;
+        } else {
+          quoted = !quoted;
+        }
+      } else if (ch === ',' && !quoted) {
+        row.push(cur);
+        cur = '';
+      } else if (ch === '\n' && !quoted) {
+        row.push(cur);
+        rows.push(row);
+        row = [];
+        cur = '';
+      } else if (ch !== '\r') {
+        cur += ch;
+      }
+    }
+    if (cur.length || row.length) {
+      row.push(cur);
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function minMax(values) {
+    const nums = values.map(v => Number(v)).filter(Number.isFinite);
+    if (!nums.length) return 'N/A';
+    return `${Math.min(...nums)} - ${Math.max(...nums)}`;
+  }
+
+  function getStateFromContext() {
+    const searchState = new URLSearchParams(window.location.search).get('state');
+    if (searchState) return searchState.replace(/-/g, ' ').toUpperCase();
+
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const indiaIndex = parts.indexOf('india');
+    if (indiaIndex !== -1 && parts[indiaIndex + 1]) {
+      return parts[indiaIndex + 1].replace(/-/g, ' ').toUpperCase();
+    }
+    return null;
+  }
+
+  async function renderDirectory() {
+    const statusEl = document.getElementById('status');
+    const grid = document.getElementById('grid');
+    const sectionTitle = document.getElementById('sectionTitle');
+    const pageTitle = document.getElementById('title');
+    const subtitle = document.getElementById('subtitle');
+
+    try {
+      const response = await fetch(CSV_URL);
+      if (!response.ok) throw new Error(`Failed to fetch CSV (${response.status})`);
+
+      const text = await response.text();
+      const [header, ...dataRows] = parseCSV(text);
+      const normalizedHeader = header.map(h => h.trim().toLowerCase());
+      const stateIdx = normalizedHeader.findIndex(h => h === 'state' || h === 'statename');
+      const districtIdx = normalizedHeader.findIndex(h => h === 'district');
+      const pincodeIdx = normalizedHeader.findIndex(h => h.includes('pin'));
+      if ([stateIdx, districtIdx, pincodeIdx].includes(-1)) {
+        throw new Error('CSV columns for state/district/pincode were not found');
+      }
+
+      const stateContext = getStateFromContext();
+      const rows = dataRows
+        .map(row => ({
+          state: (row[stateIdx] || '').trim().toUpperCase(),
+          district: (row[districtIdx] || '').trim().toUpperCase(),
+          pincode: (row[pincodeIdx] || '').trim(),
+        }))
+        .filter(row => row.state && row.district && row.pincode);
+
+      if (stateContext) {
+        const selectedState = rows.filter(row => row.state === stateContext);
+        const byDistrict = {};
+        selectedState.forEach(row => {
+          byDistrict[row.district] = byDistrict[row.district] || [];
+          byDistrict[row.district].push(row.pincode);
+        });
+
+        sectionTitle.textContent = `Select District in ${stateContext.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}`;
+        pageTitle.textContent = `${stateContext.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())} PIN Code Directory`;
+        subtitle.textContent = 'District links and PIN ranges generated from official CSV data.';
+
+        Object.keys(byDistrict)
+          .sort((a, b) => a.localeCompare(b))
+          .forEach(district => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<h3><a href="${buildLink(stateContext, district)}">${district} district</a></h3><div class="badge">${minMax(byDistrict[district])}</div>`;
+            grid.appendChild(card);
+          });
+
+        statusEl.textContent = `Loaded ${Object.keys(byDistrict).length} districts from CSV.`;
+      } else {
+        sectionTitle.textContent = 'Select State in India';
+        pageTitle.textContent = 'India PIN Code Directory';
+        subtitle.textContent = 'State links generated from the official CSV source.';
+
+        const byState = {};
+        rows.forEach(row => {
+          byState[row.state] = byState[row.state] || [];
+          byState[row.state].push(row.pincode);
+        });
+
+        Object.keys(byState)
+          .sort((a, b) => a.localeCompare(b))
+          .forEach(state => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<h3><a href="${buildLink(state)}">${state}</a></h3><div class="badge">${minMax(byState[state])}</div>`;
+            grid.appendChild(card);
+          });
+
+        statusEl.textContent = `Loaded ${Object.keys(byState).length} states from CSV.`;
+      }
+    } catch (error) {
+      statusEl.className = 'status error';
+      statusEl.textContent = `Unable to load directory data: ${error.message}`;
+    }
+  }
+
+  renderDirectory();
+</script>
+</body>
+</html>
