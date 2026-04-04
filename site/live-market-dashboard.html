@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Live Market Dashboard | Cookie-Editor Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+      rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --bg: #07111f;
+        --panel: rgba(13, 24, 42, 0.85);
+        --panel-strong: #101d31;
+        --border: rgba(148, 163, 184, 0.16);
+        --text: #e5eefc;
+        --muted: #94a3b8;
+        --positive: #22c55e;
+        --negative: #f87171;
+        --warning: #fbbf24;
+        --accent: #7c3aed;
+        --accent-2: #38bdf8;
+        --glow: rgba(56, 189, 248, 0.22);
+        --shadow: 0 24px 60px rgba(2, 8, 23, 0.42);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(124, 58, 237, 0.25),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(14, 165, 233, 0.18),
+            transparent 34%
+          ),
+          linear-gradient(180deg, #040914 0%, #07111f 45%, #06101a 100%);
+        padding: 24px;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1400px, 100%);
+        margin: 0 auto;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.3fr 0.9fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .hero-card,
+      .panel,
+      .asset-card,
+      .headline,
+      .macro-card {
+        background: var(--panel);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero-card {
+        padding: 28px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-card::after {
+        content: '';
+        position: absolute;
+        inset: auto -10% -35% auto;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(
+          circle,
+          rgba(56, 189, 248, 0.34),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #cbd5e1;
+        font-size: 0.78rem;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+      }
+
+      .pulse {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--positive);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.65);
+        animation: pulse 1.8s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.65);
+        }
+        100% {
+          box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
+        }
+      }
+
+      h1 {
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        line-height: 1.02;
+        margin-bottom: 14px;
+      }
+
+      .gradient-text {
+        background: linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #dbeafe 38%,
+          #7dd3fc 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero-copy {
+        max-width: 60ch;
+        color: #bfd0ea;
+        line-height: 1.7;
+        margin-bottom: 22px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        color: white;
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 12px 32px var(--glow);
+      }
+
+      .btn-secondary {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        padding: 24px;
+      }
+
+      .stat {
+        padding: 18px;
+        border-radius: 18px;
+        background: linear-gradient(
+          180deg,
+          rgba(15, 23, 42, 0.9),
+          rgba(15, 23, 42, 0.55)
+        );
+        border: 1px solid rgba(148, 163, 184, 0.14);
+      }
+
+      .stat-label {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .stat-value {
+        font-size: 1.55rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .stat-note,
+      .muted {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 0.8fr;
+        gap: 20px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .panel-header h2 {
+        font-size: 1.2rem;
+        margin-bottom: 6px;
+      }
+
+      .panel-subtitle {
+        color: var(--muted);
+        font-size: 0.94rem;
+        line-height: 1.55;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 10px 12px;
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        color: #dbeafe;
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+
+      .asset-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .asset-card {
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .asset-card::before {
+        content: '';
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(125, 211, 252, 0.6),
+          transparent 70%
+        );
+      }
+
+      .asset-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .asset-symbol {
+        color: var(--muted);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+
+      .asset-name {
+        font-size: 1.02rem;
+        font-weight: 600;
+      }
+
+      .asset-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .asset-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        color: #cbd5e1;
+        font-size: 0.9rem;
+      }
+
+      .delta {
+        font-weight: 700;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      .positive {
+        color: var(--positive);
+      }
+
+      .negative {
+        color: var(--negative);
+      }
+
+      .neutral {
+        color: var(--warning);
+      }
+
+      .sparkline {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        align-items: end;
+        gap: 4px;
+        height: 42px;
+        margin-top: 16px;
+      }
+
+      .sparkline span {
+        display: block;
+        width: 100%;
+        border-radius: 999px;
+        background: linear-gradient(
+          180deg,
+          rgba(56, 189, 248, 0.95),
+          rgba(124, 58, 237, 0.55)
+        );
+        min-height: 8px;
+        opacity: 0.88;
+      }
+
+      .macro-grid {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .macro-card {
+        padding: 18px;
+      }
+
+      .macro-label {
+        font-size: 0.82rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .macro-value {
+        font-size: 1.45rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .headline-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .headline {
+        padding: 16px;
+        text-decoration: none;
+        transition:
+          transform 0.18s ease,
+          border-color 0.18s ease;
+      }
+
+      .headline:hover {
+        transform: translateY(-2px);
+        border-color: rgba(125, 211, 252, 0.28);
+      }
+
+      .headline-source {
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .headline-title {
+        line-height: 1.45;
+        font-weight: 600;
+      }
+
+      .chart-wrap {
+        height: 320px;
+        margin-top: 8px;
+      }
+
+      .footnote {
+        margin-top: 20px;
+        color: var(--muted);
+        font-size: 0.84rem;
+        line-height: 1.65;
+      }
+
+      .warning-banner {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(251, 191, 36, 0.12);
+        border: 1px solid rgba(251, 191, 36, 0.18);
+        color: #fde68a;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 1080px) {
+        .hero,
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 16px;
+        }
+
+        .asset-grid,
+        .hero-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .panel-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .status-pill {
+          white-space: normal;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <article class="hero-card">
+          <div class="eyebrow">
+            <span class="pulse"></span> Alpha Vantage powered market monitor
+          </div>
+          <h1>
+            <span class="gradient-text">Live market dashboard</span> with safer
+            refresh logic.
+          </h1>
+          <p class="hero-copy">
+            This version fixes the original dashboard’s runtime issues and
+            rate-limit problems, then upgrades the UI with a cleaner
+            terminal-style layout, stronger hierarchy, and clearer live status
+            messaging.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="refreshNow">
+              ⟳ Refresh quotes
+            </button>
+            <button class="btn btn-secondary" id="refreshMacro">
+              Fetch macro/news
+            </button>
+          </div>
+          <div class="warning-banner" id="rateLimitMessage">
+            Free Alpha Vantage plans are rate-limited. Quotes refresh together,
+            while macro and news data are fetched separately to reduce failures.
+          </div>
+        </article>
+
+        <aside class="hero-card hero-stats">
+          <div class="stat">
+            <div class="stat-label">Last quote update</div>
+            <div class="stat-value" id="lastQuoteUpdate">Waiting…</div>
+            <div class="stat-note" id="quoteHealth">
+              No requests completed yet.
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Macro snapshot</div>
+            <div class="stat-value" id="lastMacroUpdate">Waiting…</div>
+            <div class="stat-note" id="macroHealth">
+              GDP, treasury, and news are loaded on demand.
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Tracked markets</div>
+            <div class="stat-value">5</div>
+            <div class="stat-note">
+              Forex, commodity proxy, crypto, and US equity proxy.
+            </div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Chart horizon</div>
+            <div class="stat-value">30 days</div>
+            <div class="stat-note">
+              SPY daily closes used as the S&amp;P 500 proxy.
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="dashboard-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Cross-asset watchlist</h2>
+              <p class="panel-subtitle">
+                Fast-moving instruments refresh together. Percentage change is
+                measured against the last successful value stored in memory.
+              </p>
+            </div>
+            <div class="status-pill" id="quoteStatus">
+              <span class="pulse"></span> Idle
+            </div>
+          </div>
+          <div class="asset-grid" id="assetGrid"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Macro overview</h2>
+              <p class="panel-subtitle">
+                Slower data is separated from live quotes to avoid overwhelming
+                the free API tier.
+              </p>
+            </div>
+            <div class="status-pill" id="macroStatus">
+              Manual fetch recommended
+            </div>
+          </div>
+          <div class="macro-grid">
+            <div class="macro-card">
+              <div class="macro-label">US 10Y Treasury</div>
+              <div class="macro-value" id="treasuryValue">—</div>
+              <div class="muted" id="treasuryMeta">Waiting for data.</div>
+            </div>
+            <div class="macro-card">
+              <div class="macro-label">US Real GDP</div>
+              <div class="macro-value" id="gdpValue">—</div>
+              <div class="muted" id="gdpMeta">Waiting for data.</div>
+            </div>
+          </div>
+          <div class="headline-list" id="headlineList">
+            <div class="headline" style="cursor: default">
+              <span class="headline-source">News feed</span>
+              <div class="headline-title">
+                Press “Fetch macro/news” to load the latest economic headlines.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top: 20px">
+        <div class="panel-header">
+          <div>
+            <h2>S&amp;P 500 proxy trend</h2>
+            <p class="panel-subtitle">
+              The original code used a duplicated document and fetched too many
+              endpoints at once. This chart now loads independently and degrades
+              gracefully if the history endpoint fails.
+            </p>
+          </div>
+          <div class="status-pill" id="chartStatus">Chart pending</div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="spChart"></canvas>
+        </div>
+        <p class="footnote">
+          Key fixes applied: removed the duplicated HTML document, converted GDP
+          values safely before formatting, preserved previous quote state
+          correctly, separated quote and macro refreshes, and added clearer
+          failure handling for rate-limit or network responses.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const API_KEY = 'J0V6CXTCM5QCCWX3';
+      const QUOTE_REFRESH_INTERVAL_MS = 120000;
+      const MACRO_CACHE_MS = 15 * 60 * 1000;
+
+      const assets = [
+        {
+          id: 'eurusd',
+          symbol: 'EUR/USD',
+          name: 'Euro vs US Dollar',
+          type: 'forex',
+          loader: () => fetchForexRate('EUR', 'USD'),
+        },
+        {
+          id: 'gbpusd',
+          symbol: 'GBP/USD',
+          name: 'British Pound vs US Dollar',
+          type: 'forex',
+          loader: () => fetchForexRate('GBP', 'USD'),
+        },
+        {
+          id: 'xauusd',
+          symbol: 'XAU/USD',
+          name: 'Gold spot proxy',
+          type: 'commodity',
+          loader: () => fetchForexRate('XAU', 'USD'),
+        },
+        {
+          id: 'btcusd',
+          symbol: 'BTC/USD',
+          name: 'Bitcoin',
+          type: 'crypto',
+          loader: () => fetchForexRate('BTC', 'USD'),
+        },
+        {
+          id: 'spy',
+          symbol: 'SPY',
+          name: 'S&P 500 ETF proxy',
+          type: 'equity',
+          loader: () => fetchStockQuote('SPY'),
+        },
+      ];
+
+      const state = {
+        previousPrices: {},
+        currentPrices: {},
+        historyByAsset: {},
+        chart: null,
+        lastMacroFetchAt: 0,
+      };
+
+      function formatTimestamp(date) {
+        return new Intl.DateTimeFormat(undefined, {
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+        }).format(date);
+      }
+
+      function formatNumber(value, type) {
+        if (!Number.isFinite(value)) return '—';
+        if (type === 'forex') return value.toFixed(5);
+        if (type === 'commodity')
+          return value.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        if (type === 'crypto')
+          return value.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        return value.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function classifyChange(change) {
+        if (!Number.isFinite(change) || change === 0) return 'neutral';
+        return change > 0 ? 'positive' : 'negative';
+      }
+
+      function buildSparkline(values) {
+        if (!values.length) {
+          return Array.from(
+            { length: 12 },
+            () => '<span style="height: 12px"></span>'
+          ).join('');
+        }
+
+        const slice = values.slice(-12);
+        const min = Math.min(...slice);
+        const max = Math.max(...slice);
+        const range = max - min || 1;
+
+        return slice
+          .map(value => {
+            const height = 10 + ((value - min) / range) * 28;
+            return `<span style="height:${height.toFixed(0)}px"></span>`;
+          })
+          .join('');
+      }
+
+      function setStatus(id, message, live = false) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = live
+          ? `<span class="pulse"></span> ${message}`
+          : message;
+      }
+
+      function updateAssetGrid(results) {
+        const grid = document.getElementById('assetGrid');
+        grid.innerHTML = results
+          .map(item => {
+            const price = state.currentPrices[item.id];
+            const previous = state.previousPrices[item.id];
+            const change = Number.isFinite(previous) ? price - previous : 0;
+            const pct =
+              Number.isFinite(previous) && previous !== 0
+                ? (change / previous) * 100
+                : 0;
+            const tone = classifyChange(change);
+            const error = item.error;
+            const priceLabel = error
+              ? 'Unavailable'
+              : formatNumber(price, item.type);
+            const changeLabel = error
+              ? 'Waiting for a valid response'
+              : `${change >= 0 ? '+' : ''}${formatNumber(change, item.type)} · ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+            const series = state.historyByAsset[item.id] || [];
+
+            return `
+            <article class="asset-card">
+              <div class="asset-top">
+                <div>
+                  <div class="asset-symbol">${item.symbol}</div>
+                  <div class="asset-name">${item.name}</div>
+                </div>
+                <div class="delta ${error ? 'neutral' : tone}">${error ? 'API limit / error' : tone === 'positive' ? 'Rising' : tone === 'negative' ? 'Falling' : 'Flat'}</div>
+              </div>
+              <div class="asset-price">${priceLabel}</div>
+              <div class="asset-meta">
+                <span class="${error ? 'neutral' : tone}">${changeLabel}</span>
+              </div>
+              <div class="sparkline">${buildSparkline(series)}</div>
+            </article>
+          `;
+          })
+          .join('');
+      }
+
+      function rememberQuote(id, price) {
+        if (!Number.isFinite(price)) return;
+        state.previousPrices[id] = state.currentPrices[id];
+        state.currentPrices[id] = price;
+        state.historyByAsset[id] = [
+          ...(state.historyByAsset[id] || []),
+          price,
+        ].slice(-24);
+      }
+
+      async function getJson(url) {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.Note) {
+          throw new Error('Alpha Vantage rate limit reached.');
+        }
+
+        if (data.Information) {
+          throw new Error(data.Information);
+        }
+
+        if (data['Error Message']) {
+          throw new Error(data['Error Message']);
+        }
+
+        return data;
+      }
+
+      async function fetchForexRate(from, to) {
+        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${from}&to_currency=${to}&apikey=${API_KEY}`;
+        const data = await getJson(url);
+        const raw = data['Realtime Currency Exchange Rate'];
+        if (!raw) throw new Error(`Missing forex payload for ${from}/${to}.`);
+        return {
+          price: Number.parseFloat(raw['5. Exchange Rate']),
+          timestamp: raw['6. Last Refreshed'],
+        };
+      }
+
+      async function fetchStockQuote(symbol) {
+        const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_KEY}`;
+        const data = await getJson(url);
+        const raw = data['Global Quote'];
+        if (!raw || !raw['05. price'])
+          throw new Error(`Missing quote payload for ${symbol}.`);
+        return {
+          price: Number.parseFloat(raw['05. price']),
+          timestamp: raw['07. latest trading day'],
+        };
+      }
+
+      async function fetchTreasuryYield() {
+        const url = `https://www.alphavantage.co/query?function=TREASURY_YIELD&interval=monthly&maturity=10year&apikey=${API_KEY}`;
+        const data = await getJson(url);
+        const latest = data.data && data.data[0];
+        if (!latest) throw new Error('Missing treasury data.');
+        return {
+          value: Number.parseFloat(latest.value),
+          date: latest.date,
+        };
+      }
+
+      async function fetchGDP() {
+        const url = `https://www.alphavantage.co/query?function=REAL_GDP&apikey=${API_KEY}`;
+        const data = await getJson(url);
+        const latest = data.data && data.data[0];
+        if (!latest) throw new Error('Missing GDP data.');
+        return {
+          value: Number.parseFloat(latest.value ?? latest.gdp),
+          date: latest.date,
+        };
+      }
+
+      async function fetchEconomicNews() {
+        const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=economy_macro,economic_monetary&limit=4&apikey=${API_KEY}`;
+        const data = await getJson(url);
+        return Array.isArray(data.feed) ? data.feed.slice(0, 4) : [];
+      }
+
+      async function fetchSpyHistory() {
+        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SPY&outputsize=compact&apikey=${API_KEY}`;
+        const data = await getJson(url);
+        const series = data['Time Series (Daily)'];
+        if (!series) throw new Error('Missing SPY history.');
+        const dates = Object.keys(series).sort().slice(-30);
+        const prices = dates.map(date =>
+          Number.parseFloat(series[date]['4. close'])
+        );
+        return { dates, prices };
+      }
+
+      async function refreshQuotes() {
+        setStatus('quoteStatus', 'Refreshing quotes…', true);
+        const results = await Promise.all(
+          assets.map(async asset => {
+            try {
+              const result = await asset.loader();
+              rememberQuote(asset.id, result.price);
+              return { ...asset, ...result, error: null };
+            } catch (error) {
+              return { ...asset, error: error.message };
+            }
+          })
+        );
+
+        updateAssetGrid(results);
+        const successCount = results.filter(item => !item.error).length;
+        document.getElementById('lastQuoteUpdate').textContent =
+          formatTimestamp(new Date());
+        document.getElementById('quoteHealth').textContent =
+          `${successCount}/${results.length} quote requests succeeded.`;
+        setStatus(
+          'quoteStatus',
+          successCount
+            ? `Quotes updated (${successCount}/${results.length})`
+            : 'Quote refresh failed'
+        );
+      }
+
+      async function refreshMacro(force = false) {
+        const now = Date.now();
+        if (
+          !force &&
+          state.lastMacroFetchAt &&
+          now - state.lastMacroFetchAt < MACRO_CACHE_MS
+        ) {
+          setStatus('macroStatus', 'Using recent macro cache');
+          return;
+        }
+
+        setStatus('macroStatus', 'Fetching macro/news…', true);
+        const [treasury, gdp, news] = await Promise.allSettled([
+          fetchTreasuryYield(),
+          fetchGDP(),
+          fetchEconomicNews(),
+        ]);
+
+        if (treasury.status === 'fulfilled') {
+          document.getElementById('treasuryValue').textContent =
+            `${treasury.value.value.toFixed(3)}%`;
+          document.getElementById('treasuryMeta').textContent =
+            `Latest monthly observation: ${treasury.value.date}`;
+        } else {
+          document.getElementById('treasuryMeta').textContent =
+            treasury.reason.message;
+        }
+
+        if (gdp.status === 'fulfilled') {
+          document.getElementById('gdpValue').textContent =
+            `$${gdp.value.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}B`;
+          document.getElementById('gdpMeta').textContent =
+            `Reference period: ${gdp.value.date}`;
+        } else {
+          document.getElementById('gdpMeta').textContent = gdp.reason.message;
+        }
+
+        const headlineList = document.getElementById('headlineList');
+        if (news.status === 'fulfilled' && news.value.length) {
+          headlineList.innerHTML = news.value
+            .map(article => {
+              const published = article.time_published
+                ? new Date(article.time_published).toLocaleString()
+                : 'Timestamp unavailable';
+              return `
+              <a class="headline" href="${article.url || '#'}" target="_blank" rel="noreferrer noopener">
+                <span class="headline-source">${article.source || 'Unknown source'} · ${published}</span>
+                <div class="headline-title">${article.title || 'Untitled article'}</div>
+              </a>
+            `;
+            })
+            .join('');
+        } else {
+          headlineList.innerHTML = `
+          <div class="headline" style="cursor: default;">
+            <span class="headline-source">News feed</span>
+            <div class="headline-title">${news.status === 'rejected' ? news.reason.message : 'No recent headlines returned.'}</div>
+          </div>
+        `;
+        }
+
+        state.lastMacroFetchAt = now;
+        document.getElementById('lastMacroUpdate').textContent =
+          formatTimestamp(new Date());
+        document.getElementById('macroHealth').textContent =
+          'Macro panels updated with the latest successful responses.';
+        setStatus('macroStatus', 'Macro snapshot updated');
+      }
+
+      async function refreshChart() {
+        setStatus('chartStatus', 'Loading chart…', true);
+        try {
+          const history = await fetchSpyHistory();
+          const context = document.getElementById('spChart');
+          if (state.chart) state.chart.destroy();
+
+          state.chart = new Chart(context, {
+            type: 'line',
+            data: {
+              labels: history.dates,
+              datasets: [
+                {
+                  label: 'SPY close',
+                  data: history.prices,
+                  borderColor: '#7dd3fc',
+                  borderWidth: 2,
+                  fill: true,
+                  pointRadius: 0,
+                  tension: 0.3,
+                  backgroundColor: ctx => {
+                    const chart = ctx.chart;
+                    const { ctx: chartContext, chartArea } = chart;
+                    if (!chartArea) return 'rgba(125, 211, 252, 0.12)';
+                    const gradient = chartContext.createLinearGradient(
+                      0,
+                      chartArea.top,
+                      0,
+                      chartArea.bottom
+                    );
+                    gradient.addColorStop(0, 'rgba(56, 189, 248, 0.30)');
+                    gradient.addColorStop(1, 'rgba(124, 58, 237, 0.02)');
+                    return gradient;
+                  },
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  labels: {
+                    color: '#dbeafe',
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    color: '#94a3b8',
+                    maxTicksLimit: 6,
+                  },
+                  grid: {
+                    color: 'rgba(148, 163, 184, 0.08)',
+                  },
+                },
+                y: {
+                  ticks: {
+                    color: '#94a3b8',
+                  },
+                  grid: {
+                    color: 'rgba(148, 163, 184, 0.08)',
+                  },
+                },
+              },
+            },
+          });
+
+          setStatus('chartStatus', 'Chart updated');
+        } catch (error) {
+          setStatus('chartStatus', 'Chart unavailable');
+        }
+      }
+
+      async function boot() {
+        updateAssetGrid(
+          assets.map(asset => ({
+            ...asset,
+            error: 'Waiting for first response',
+          }))
+        );
+        await refreshQuotes();
+        await refreshChart();
+        setInterval(() => {
+          refreshQuotes().catch(() =>
+            setStatus('quoteStatus', 'Quote refresh failed')
+          );
+        }, QUOTE_REFRESH_INTERVAL_MS);
+      }
+
+      document.getElementById('refreshNow').addEventListener('click', () => {
+        refreshQuotes().catch(() =>
+          setStatus('quoteStatus', 'Quote refresh failed')
+        );
+      });
+
+      document.getElementById('refreshMacro').addEventListener('click', () => {
+        refreshMacro(true).catch(() =>
+          setStatus('macroStatus', 'Macro refresh failed')
+        );
+      });
+
+      boot().catch(() => {
+        setStatus('quoteStatus', 'Initial load failed');
+        setStatus('chartStatus', 'Initial chart load failed');
+      });
+    </script>
+  </body>
+</html>
